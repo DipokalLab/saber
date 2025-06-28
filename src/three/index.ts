@@ -1,9 +1,17 @@
 import * as THREE from "three";
+import {
+  EffectComposer,
+  EffectPass,
+  RenderPass,
+  SelectiveBloomEffect,
+} from "postprocessing";
+import { Saber } from "./saber";
 
 export class Scene {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
+  composer: EffectComposer;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -13,19 +21,35 @@ export class Scene {
       1000
     );
 
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({
+      powerPreference: "high-performance",
+      antialias: false,
+    });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setAnimationLoop(this.animate.bind(this));
 
     const dom = document.querySelector("#game") as Element;
     dom.appendChild(this.renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    this.scene.add(cube);
+    const saber = new Saber();
+    this.scene.add(saber.mesh);
 
-    this.camera.position.z = 5;
+    const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
+      intensity: 8,
+      mipmapBlur: true,
+      luminanceThreshold: 0,
+      luminanceSmoothing: 0.2,
+      radius: 0.618,
+      resolutionScale: 128,
+    });
+
+    bloomEffect.selection.add(saber.mesh);
+
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    this.composer.addPass(new EffectPass(this.camera, bloomEffect));
+
+    this.camera.position.z = 30;
 
     window.addEventListener("resize", this.onWindowResize.bind(this));
   }
@@ -40,6 +64,7 @@ export class Scene {
   }
 
   animate() {
-    this.renderer.render(this.scene, this.camera);
+    //this.renderer.render(this.scene, this.camera);
+    this.composer.render();
   }
 }
