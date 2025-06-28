@@ -13,6 +13,7 @@ export class Scene {
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   composer: EffectComposer;
+  saber: Saber;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -35,8 +36,8 @@ export class Scene {
     const hilt = new Hilt();
     this.scene.add(hilt.mesh);
 
-    const saber = new Saber();
-    hilt.mesh.add(saber.mesh);
+    this.saber = new Saber();
+    hilt.mesh.add(this.saber.mesh);
 
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
       intensity: 8,
@@ -47,7 +48,7 @@ export class Scene {
       resolutionScale: 128,
     });
 
-    bloomEffect.selection.add(saber.mesh);
+    bloomEffect.selection.add(this.saber.mesh);
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -56,10 +57,11 @@ export class Scene {
     this.camera.position.z = 30;
     this.camera.position.y = 10;
 
-    window.addEventListener("resize", this.onWindowResize.bind(this));
+    window.addEventListener("resize", this.handleWindowResize.bind(this));
+    window.addEventListener("click", this.handleClick.bind(this));
   }
 
-  onWindowResize() {
+  handleWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
 
@@ -68,8 +70,20 @@ export class Scene {
     this.animate();
   }
 
+  handleClick(e: MouseEvent) {
+    if (!e) return;
+    if (!e.target) return;
+
+    if (e.target instanceof Element) {
+      if (e.target.id == "root") {
+        this.saber.toggle();
+      }
+    }
+  }
+
   animate() {
     //this.renderer.render(this.scene, this.camera);
+    this.saber.update();
     this.composer.render();
   }
 }
