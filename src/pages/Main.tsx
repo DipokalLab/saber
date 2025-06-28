@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import { Play, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
+import HandTracking from "@/features/tracking/HandTracking";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
@@ -33,28 +34,31 @@ export default function HomePage() {
   );
 
   return (
-    <main className={mainClasses}>
-      <section className="text-center max-w-3xl text-white">
-        <AnimatedTitle className="mb-4">Light Saber</AnimatedTitle>
-        <p className="text-xl text-slate-300 mb-8">Press Start to Begin</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button onClick={handleStartGame} variant="secondary" size="lg">
-            <Play className="mr-2 h-5 w-5" />
-            Game Start
-          </Button>
+    <>
+      <HandTracking />
+      <main className={mainClasses}>
+        <section className="text-center max-w-3xl text-white">
+          <AnimatedTitle className="mb-4">Light Saber</AnimatedTitle>
+          <p className="text-xl text-slate-300 mb-8">Press Start to Begin</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button onClick={handleStartGame} variant="secondary" size="lg">
+              <Play className="mr-2 h-5 w-5" />
+              Game Start
+            </Button>
 
-          <Button asChild size="lg">
-            <a
-              href="https://github.com/DipokalLab/saber"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <SquareCode className="mr-2 h-5 w-5" />
-              GitHub
-            </a>
-          </Button>
-        </div>
-      </section>
-    </main>
+            <Button asChild size="lg">
+              <a
+                href="https://github.com/DipokalLab/saber"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <SquareCode className="mr-2 h-5 w-5" />
+                GitHub
+              </a>
+            </Button>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }

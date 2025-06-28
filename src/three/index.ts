@@ -14,6 +14,7 @@ export class Scene {
   renderer: THREE.WebGLRenderer;
   composer: EffectComposer;
   saber: Saber;
+  hilt: Hilt;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -33,11 +34,11 @@ export class Scene {
     const dom = document.querySelector("#game") as Element;
     dom.appendChild(this.renderer.domElement);
 
-    const hilt = new Hilt();
-    this.scene.add(hilt.mesh);
+    this.hilt = new Hilt();
+    this.scene.add(this.hilt.mesh);
 
     this.saber = new Saber();
-    hilt.mesh.add(this.saber.mesh);
+    this.hilt.mesh.add(this.saber.mesh);
 
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
       intensity: 8,
@@ -84,6 +85,7 @@ export class Scene {
   animate() {
     //this.renderer.render(this.scene, this.camera);
     this.saber.update();
+    this.hilt.update();
     this.composer.render();
   }
 }

@@ -12,6 +12,8 @@
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
     "@mdx-js/rollup": "^3.1.0",
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/hands": "^0.4.1675469240",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
@@ -27,7 +29,8 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.10",
     "three": "^0.177.0",
-    "vite-plugin-mdx": "^3.6.1"
+    "vite-plugin-mdx": "^3.6.1",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
