@@ -1,9 +1,59 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import clsx from "clsx";
+import { Play, SquareCode } from "lucide-react";
+import AnimatedTitle from "@/features/title/Title";
+
 export default function HomePage() {
+  const [isVisible, setIsVisible] = useState(true);
+
+  const handleStartGame = () => {
+    setIsVisible(false);
+  };
+
+  const mainClasses = clsx(
+    "absolute",
+    "inset-0",
+    "flex",
+    "flex-col",
+    "items-center",
+    "justify-center",
+    "p-4",
+    "bg-black/80",
+    "backdrop-blur-2xl",
+    "transition-opacity",
+    "duration-700",
+    "ease-in-out",
+    {
+      "opacity-100": isVisible,
+      "opacity-0 pointer-events-none": !isVisible,
+    }
+  );
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-4 py-12 bg-white text-gray-900">
-      <section className="text-center max-w-3xl">
-        <h1 className="text-4xl md:text-6xl font-extrabold mb-6">lightsaber</h1>
-        <p className="text-lg text-gray-600 mb-8"></p>
+    <main className={mainClasses}>
+      <section className="text-center max-w-3xl text-white">
+        <AnimatedTitle className="mb-4">Light Saber</AnimatedTitle>
+        <p className="text-xl text-slate-300 mb-6">Press Start to Begin</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button onClick={handleStartGame} variant="secondary" size="lg">
+            <Play className="mr-2 h-5 w-5" />
+            Game Start
+          </Button>
+
+          <Button asChild size="lg">
+            <a
+              href="https://github.com/DipokalLab/saber"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <SquareCode className="mr-2 h-5 w-5" />
+              GitHub
+            </a>
+          </Button>
+        </div>
       </section>
     </main>
   );
