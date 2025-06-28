@@ -6,6 +6,7 @@ import {
   SelectiveBloomEffect,
 } from "postprocessing";
 import { Saber } from "./saber";
+import { Hilt } from "./hilt";
 
 export class Scene {
   scene: THREE.Scene;
@@ -31,8 +32,11 @@ export class Scene {
     const dom = document.querySelector("#game") as Element;
     dom.appendChild(this.renderer.domElement);
 
+    const hilt = new Hilt();
+    this.scene.add(hilt.mesh);
+
     const saber = new Saber();
-    this.scene.add(saber.mesh);
+    hilt.mesh.add(saber.mesh);
 
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
       intensity: 8,
@@ -50,6 +54,7 @@ export class Scene {
     this.composer.addPass(new EffectPass(this.camera, bloomEffect));
 
     this.camera.position.z = 30;
+    this.camera.position.y = 10;
 
     window.addEventListener("resize", this.onWindowResize.bind(this));
   }

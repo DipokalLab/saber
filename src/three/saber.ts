@@ -7,8 +7,10 @@ export class Saber {
     THREE.Object3DEventMap
   >;
   constructor() {
-    const geometry = new THREE.CylinderGeometry(0.25, 0.25, 20, 32);
+    const height = 20;
+    const geometry = new THREE.CylinderGeometry(0.25, 0.25, height, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xf25c5a });
     this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh.position.y = height / 2;
   }
 }
