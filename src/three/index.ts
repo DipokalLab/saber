@@ -26,7 +26,7 @@ export class Scene {
 
     this.renderer = new THREE.WebGLRenderer({
       powerPreference: "high-performance",
-      antialias: false,
+      antialias: true,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setAnimationLoop(this.animate.bind(this));
