@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import "./style.css";
 
 interface AnimatedTitleProps {
   children: React.ReactNode;

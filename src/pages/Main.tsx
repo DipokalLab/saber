@@ -36,7 +36,7 @@ export default function HomePage() {
     <main className={mainClasses}>
       <section className="text-center max-w-3xl text-white">
         <AnimatedTitle className="mb-4">Light Saber</AnimatedTitle>
-        <p className="text-xl text-slate-300 mb-6">Press Start to Begin</p>
+        <p className="text-xl text-slate-300 mb-8">Press Start to Begin</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button onClick={handleStartGame} variant="secondary" size="lg">
             <Play className="mr-2 h-5 w-5" />
