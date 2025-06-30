@@ -6,12 +6,15 @@ import clsx from "clsx";
 import { Play, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
 import HandTracking from "@/features/tracking/HandTracking";
+import { useInGameStore } from "@/features/inGame/store";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
+  const setIsStart = useInGameStore((state) => state.setIsStart);
 
   const handleStartGame = () => {
     setIsVisible(false);
+    setIsStart(true);
   };
 
   const mainClasses = clsx(

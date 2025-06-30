@@ -7,6 +7,7 @@ import {
 } from "postprocessing";
 import { Saber } from "./saber";
 import { Hilt } from "./hilt";
+import { useInGameStore, type InGameState } from "@/features/inGame/store";
 
 export class Scene {
   scene: THREE.Scene;
@@ -60,6 +61,18 @@ export class Scene {
 
     window.addEventListener("resize", this.handleWindowResize.bind(this));
     window.addEventListener("click", this.handleClick.bind(this));
+
+    useInGameStore.subscribe((currentState) => {
+      this.handleGameStartChange(currentState);
+    });
+  }
+
+  handleGameStartChange(state: InGameState) {
+    if (state.isStart) {
+      this.renderer.domElement.requestPointerLock();
+    } else {
+      document.exitPointerLock();
+    }
   }
 
   handleWindowResize() {
@@ -77,7 +90,8 @@ export class Scene {
 
     if (e.target instanceof Element) {
       if (e.target.id == "root") {
-        this.saber.toggle();
+        //this.saber.toggle();
+        this.renderer.domElement.requestPointerLock();
       }
     }
   }

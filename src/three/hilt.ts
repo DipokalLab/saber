@@ -22,7 +22,7 @@ export class Hilt {
     this.mesh = new THREE.Mesh(geometry, material);
   }
 
-  update() {
+  updateHand() {
     const hands = useHandStore.getState().landmarks;
     if (!hands.length) return;
     const lm = hands[0];
@@ -41,5 +41,9 @@ export class Hilt {
     this.dir.copy(vI).add(vM).add(vR).add(vP).normalize();
     this.targetQuat.setFromUnitVectors(this.up, this.dir);
     this.mesh.quaternion.slerp(this.targetQuat, this.rotLerp);
+  }
+
+  update() {
+    this.updateHand();
   }
 }
