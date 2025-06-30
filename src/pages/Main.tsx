@@ -38,7 +38,7 @@ export default function HomePage() {
       <HandTracking />
       <main className={mainClasses}>
         <section className="text-center max-w-3xl text-white">
-          <AnimatedTitle className="mb-4">Light Saber</AnimatedTitle>
+          <AnimatedTitle className="mb-4">Light Saber Simulator</AnimatedTitle>
           <p className="text-xl text-slate-300 mb-8">Press Start to Begin</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button onClick={handleStartGame} variant="secondary" size="lg">
