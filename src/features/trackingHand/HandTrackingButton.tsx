@@ -1,0 +1,32 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { useInGameStore } from "../inGame/store";
+import { useHandTracking } from "./useHandTracking";
+
+const HandTrackingButton: React.FC = () => {
+  const { videoRef, isTrackingEnabled, setIsTrackingEnabled } =
+    useHandTracking();
+  const setControlMode = useInGameStore((state) => state.setControlMode);
+
+  const handleClick = () => {
+    const nextEnabledState = !isTrackingEnabled;
+    setIsTrackingEnabled(nextEnabledState);
+
+    if (nextEnabledState) {
+      setControlMode("hand");
+    } else {
+      setControlMode("mouse");
+    }
+  };
+
+  return (
+    <>
+      <video ref={videoRef} className="hidden" autoPlay playsInline muted />
+      <Button className="absolute top-4 right-4 z-300" onClick={handleClick}>
+        {isTrackingEnabled ? "Disable Camera" : "Enable Camera"}
+      </Button>
+    </>
+  );
+};
+
+export default HandTrackingButton;

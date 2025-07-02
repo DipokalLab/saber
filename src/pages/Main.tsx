@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import { Play, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
-import HandTracking from "@/features/tracking/HandTracking";
+import HandTrackingButton from "@/features/trackingHand/HandTrackingButton";
 import { useInGameStore } from "@/features/inGame/store";
-import { useMouseTracker } from "@/features/mouse/useMouseTracker";
+import { useMouseTracker } from "@/features/trackingMouse/useMouseTracker";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
@@ -40,7 +40,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HandTracking />
+      <HandTrackingButton />
       <main className={mainClasses}>
         <section className="text-center max-w-3xl text-white">
           <AnimatedTitle className="mb-4">Light Saber Simulator</AnimatedTitle>

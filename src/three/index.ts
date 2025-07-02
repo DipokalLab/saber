@@ -61,10 +61,17 @@ export class Scene {
 
     window.addEventListener("resize", this.handleWindowResize.bind(this));
     window.addEventListener("click", this.handleClick.bind(this));
+    window.addEventListener("keydown", this.handleKeyDown.bind(this));
 
     useInGameStore.subscribe((currentState) => {
       this.handleGameStartChange(currentState);
     });
+  }
+
+  handleKeyDown(e: KeyboardEvent) {
+    if (e.code === "Space") {
+      this.saber.toggle();
+    }
   }
 
   handleGameStartChange(state: InGameState) {

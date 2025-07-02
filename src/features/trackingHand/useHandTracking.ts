@@ -1,27 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Hands } from "@mediapipe/hands";
 import type { Results } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
-import { Button } from "@/components/ui/button";
 import { useHandStore } from "./store";
-import { useInGameStore } from "../inGame/store";
 
-const CameraToggle: React.FC = () => {
+export const useHandTracking = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [enabled, setEnabled] = useState(false);
+  const [isTrackingEnabled, setIsTrackingEnabled] = useState(false);
   const setLandmarks = useHandStore((state) => state.setLandmarks);
-  const setControlMode = useInGameStore((state) => state.setControlMode);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
     let hands: Hands | null = null;
     let camera: Camera | null = null;
 
-    if (enabled && videoRef.current) {
+    if (isTrackingEnabled && videoRef.current) {
+      const videoElement = videoRef.current;
       navigator.mediaDevices.getUserMedia({ video: true }).then((s) => {
         stream = s;
-        videoRef.current!.srcObject = stream;
-        videoRef.current!.play();
+        videoElement.srcObject = stream;
+        videoElement.play();
 
         hands = new Hands({
           locateFile: (file) =>
@@ -37,9 +35,9 @@ const CameraToggle: React.FC = () => {
           setLandmarks(results.multiHandLandmarks ?? []);
         });
 
-        camera = new Camera(videoRef.current!, {
+        camera = new Camera(videoElement, {
           onFrame: async () => {
-            await hands!.send({ image: videoRef.current! });
+            await hands!.send({ image: videoElement });
           },
           width: 640,
           height: 480,
@@ -57,25 +55,7 @@ const CameraToggle: React.FC = () => {
         stream.getTracks().forEach((t) => t.stop());
       }
     };
-  }, [enabled, setLandmarks]);
+  }, [isTrackingEnabled, setLandmarks]);
 
-  const handleClick = () => {
-    if (enabled) {
-      setControlMode("mouse");
-    } else {
-      setControlMode("hand");
-    }
-    setEnabled(!enabled);
-  };
-
-  return (
-    <>
-      <video ref={videoRef} className="hidden" autoPlay playsInline muted />
-      <Button className="absolute top-4 right-4 z-300" onClick={handleClick}>
-        {enabled ? "Disable Camera" : "Enable Camera"}
-      </Button>
-    </>
-  );
+  return { videoRef, isTrackingEnabled, setIsTrackingEnabled };
 };
-
-export default CameraToggle;

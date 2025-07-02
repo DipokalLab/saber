@@ -1,6 +1,6 @@
 import { useInGameStore } from "@/features/inGame/store";
-import { useMouseStore } from "@/features/mouse/stote";
-import { useHandStore } from "@/features/tracking/store";
+import { useMouseStore } from "@/features/trackingMouse/stote";
+import { useHandStore } from "@/features/trackingHand/store";
 import * as THREE from "three";
 
 export class Hilt {
