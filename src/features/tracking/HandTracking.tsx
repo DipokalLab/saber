@@ -4,11 +4,13 @@ import type { Results } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { Button } from "@/components/ui/button";
 import { useHandStore } from "./store";
+import { useInGameStore } from "../inGame/store";
 
 const CameraToggle: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [enabled, setEnabled] = useState(false);
   const setLandmarks = useHandStore((state) => state.setLandmarks);
+  const setControlMode = useInGameStore((state) => state.setControlMode);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -57,13 +59,19 @@ const CameraToggle: React.FC = () => {
     };
   }, [enabled, setLandmarks]);
 
+  const handleClick = () => {
+    if (enabled) {
+      setControlMode("mouse");
+    } else {
+      setControlMode("hand");
+    }
+    setEnabled(!enabled);
+  };
+
   return (
     <>
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
-      <Button
-        className="absolute top-4 right-4 z-300"
-        onClick={() => setEnabled((e) => !e)}
-      >
+      <Button className="absolute top-4 right-4 z-300" onClick={handleClick}>
         {enabled ? "Disable Camera" : "Enable Camera"}
       </Button>
     </>

@@ -18,10 +18,16 @@ export class Hilt {
   private dir = new THREE.Vector3();
   private targetQuat = new THREE.Quaternion();
 
-  private basePosition = new THREE.Vector3(0, 0, 0);
-  private baseQuaternion = new THREE.Quaternion();
   private moveSensitivity = 0.05;
-  private returnDamping = 0.05;
+
+  private swingRotation = new THREE.Quaternion();
+  private swingDamping = 0.05;
+  private swingSensitivity = 0.008;
+
+  private positionBounds = new THREE.Box3(
+    new THREE.Vector3(-15, -10, 0),
+    new THREE.Vector3(15, 10, 0)
+  );
 
   constructor() {
     const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
@@ -31,6 +37,8 @@ export class Hilt {
 
   updateHand() {
     const hands = useHandStore.getState().landmarks;
+    console.log(hands);
+
     if (!hands.length) return;
     const lm = hands[0];
     const s = this.scaleRange;
@@ -56,10 +64,37 @@ export class Hilt {
     this.targetPosition.x += dx * this.moveSensitivity;
     this.targetPosition.y -= dy * this.moveSensitivity;
 
+    this.targetPosition.clamp(this.positionBounds.min, this.positionBounds.max);
+
     this.mesh.position.lerp(this.targetPosition, this.posLerp);
+
+    if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
+      const zSwingAxis = new THREE.Vector3(0, 0, 1);
+      const zSwingAmount = -dx * this.swingSensitivity;
+      const zDelta = new THREE.Quaternion().setFromAxisAngle(
+        zSwingAxis,
+        zSwingAmount
+      );
+
+      const xSwingAxis = new THREE.Vector3(1, 0, 0);
+      const xSwingAmount = dy * this.swingSensitivity;
+      const xDelta = new THREE.Quaternion().setFromAxisAngle(
+        xSwingAxis,
+        xSwingAmount
+      );
+
+      this.swingRotation.premultiply(zDelta).premultiply(xDelta);
+    }
+
+    this.mesh.quaternion.slerp(this.swingRotation, this.rotLerp);
+
+    this.swingRotation.slerp(new THREE.Quaternion(), 1 - this.swingDamping);
   }
+
   update() {
     const controlMode = useInGameStore.getState().controlMode;
+
+    console.log(controlMode);
 
     if (controlMode === "mouse") {
       this.updateMouse();
