@@ -7,10 +7,12 @@ import { Play, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
 import HandTracking from "@/features/tracking/HandTracking";
 import { useInGameStore } from "@/features/inGame/store";
+import { useMouseTracker } from "@/features/mouse/useMouseTracker";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
   const setIsStart = useInGameStore((state) => state.setIsStart);
+  useMouseTracker();
 
   const handleStartGame = () => {
     setIsVisible(false);

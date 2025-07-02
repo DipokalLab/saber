@@ -1,3 +1,5 @@
+import { useInGameStore } from "@/features/inGame/store";
+import { useMouseStore } from "@/features/mouse/stote";
 import { useHandStore } from "@/features/tracking/store";
 import * as THREE from "three";
 
@@ -15,6 +17,11 @@ export class Hilt {
   private wP = new THREE.Vector3();
   private dir = new THREE.Vector3();
   private targetQuat = new THREE.Quaternion();
+
+  private basePosition = new THREE.Vector3(0, 0, 0);
+  private baseQuaternion = new THREE.Quaternion();
+  private moveSensitivity = 0.05;
+  private returnDamping = 0.05;
 
   constructor() {
     const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
@@ -43,7 +50,21 @@ export class Hilt {
     this.mesh.quaternion.slerp(this.targetQuat, this.rotLerp);
   }
 
+  updateMouse() {
+    const { dx, dy } = useMouseStore.getState();
+
+    this.targetPosition.x += dx * this.moveSensitivity;
+    this.targetPosition.y -= dy * this.moveSensitivity;
+
+    this.mesh.position.lerp(this.targetPosition, this.posLerp);
+  }
   update() {
-    this.updateHand();
+    const controlMode = useInGameStore.getState().controlMode;
+
+    if (controlMode === "mouse") {
+      this.updateMouse();
+    } else if (controlMode === "hand") {
+      this.updateHand();
+    }
   }
 }
