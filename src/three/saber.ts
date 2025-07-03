@@ -2,8 +2,8 @@ import * as THREE from "three";
 
 export class Saber {
   public mesh: THREE.Mesh<
-    THREE.CylinderGeometry,
-    THREE.MeshBasicMaterial,
+    THREE.CapsuleGeometry,
+    THREE.MeshStandardMaterial,
     THREE.Object3DEventMap
   >;
   private initialHeight: number;
@@ -13,8 +13,12 @@ export class Saber {
   private animationDuration: number;
   constructor() {
     const height = 20;
-    const geometry = new THREE.CylinderGeometry(0.25, 0.25, height, 32);
-    const material = new THREE.MeshBasicMaterial({ color: 0xf25c5a });
+    const geometry = new THREE.CapsuleGeometry(0.25, height, 4, 8, 1);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xf25c5a,
+      emissive: 0xf02b2b,
+    });
+    material.emissiveIntensity = 7.5;
     this.mesh = new THREE.Mesh(geometry, material);
 
     this.initialHeight = height;

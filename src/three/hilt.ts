@@ -4,7 +4,7 @@ import { useHandStore } from "@/features/trackingHand/store";
 import * as THREE from "three";
 
 export class Hilt {
-  mesh: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshBasicMaterial>;
+  mesh: THREE.Group;
   private posLerp = 0.1;
   private rotLerp = 0.3;
   private scaleRange = 30;
@@ -30,9 +30,13 @@ export class Hilt {
   );
 
   constructor() {
+    this.mesh = new THREE.Group();
+
     const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    this.mesh = new THREE.Mesh(geometry, material);
+    const hilt = new THREE.Mesh(geometry, material);
+    hilt.position.set(0, -1, 0);
+    this.mesh.add(hilt);
   }
 
   updateHand() {
