@@ -1,19 +1,23 @@
 import * as THREE from "three";
+import * as RAPIER from "@dimforge/rapier3d-compat";
 
 export class Saber {
-  public mesh: THREE.Mesh<
-    THREE.CapsuleGeometry,
-    THREE.MeshStandardMaterial,
-    THREE.Object3DEventMap
-  >;
+  public mesh: THREE.Mesh<THREE.CapsuleGeometry, THREE.MeshStandardMaterial>;
+  public rigidBody: RAPIER.RigidBody;
+  public collider: RAPIER.Collider;
+
   private initialHeight: number;
   private isAnimating: boolean;
   private isOpening: boolean;
   private animationStartTime: number;
   private animationDuration: number;
-  constructor() {
+  private world: RAPIER.World;
+
+  constructor(world: RAPIER.World) {
+    this.world = world;
     const height = 20;
-    const geometry = new THREE.CapsuleGeometry(0.25, height, 4, 8, 1);
+    const radius = 0.25;
+    const geometry = new THREE.CapsuleGeometry(radius, height, 4, 8, 1);
     const material = new THREE.MeshStandardMaterial({
       color: 0xf25c5a,
       emissive: 0xf02b2b,
@@ -23,6 +27,15 @@ export class Saber {
 
     this.initialHeight = height;
     this.mesh.position.y = this.initialHeight / 2;
+
+    const rigidBodyDesc = RAPIER.RigidBodyDesc.kinematicPositionBased();
+    this.rigidBody = this.world.createRigidBody(rigidBodyDesc);
+
+    const colliderDesc = RAPIER.ColliderDesc.capsule(
+      this.initialHeight / 2,
+      radius
+    );
+    this.collider = this.world.createCollider(colliderDesc, this.rigidBody);
 
     this.isAnimating = false;
     this.isOpening = false;
@@ -44,33 +57,39 @@ export class Saber {
   }
 
   public update() {
-    if (!this.isAnimating) return;
+    if (this.isAnimating) {
+      const currentTime = performance.now();
+      const elapsedTime = currentTime - this.animationStartTime;
+      const progress = Math.min(elapsedTime / this.animationDuration, 1.0);
+      const easedProgress =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-    const currentTime = performance.now();
-    const elapsedTime = currentTime - this.animationStartTime;
+      const targetScaleY = this.isOpening ? 1 : 0;
+      const targetPositionY = this.isOpening ? this.initialHeight / 2 : 0;
+      const startScaleY = this.isOpening ? 0 : 1;
+      const startPositionY = this.isOpening ? 0 : this.initialHeight / 2;
 
-    const progress = Math.min(elapsedTime / this.animationDuration, 1.0);
+      this.mesh.scale.y =
+        startScaleY + (targetScaleY - startScaleY) * easedProgress;
+      this.mesh.position.y =
+        startPositionY + (targetPositionY - startPositionY) * easedProgress;
 
-    const easedProgress =
-      progress < 0.5
-        ? 4 * progress * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-    const targetScaleY = this.isOpening ? 1 : 0;
-    const targetPositionY = this.isOpening ? this.initialHeight / 2 : 0;
-
-    const startScaleY = this.isOpening ? 0 : 1;
-    const startPositionY = this.isOpening ? 0 : this.initialHeight / 2;
-
-    this.mesh.scale.y =
-      startScaleY + (targetScaleY - startScaleY) * easedProgress;
-    this.mesh.position.y =
-      startPositionY + (targetPositionY - startPositionY) * easedProgress;
-
-    if (progress >= 1.0) {
-      this.isAnimating = false;
-      this.mesh.scale.y = targetScaleY;
-      this.mesh.position.y = targetPositionY;
+      if (progress >= 1.0) {
+        this.isAnimating = false;
+        this.mesh.scale.y = targetScaleY;
+        this.mesh.position.y = targetPositionY;
+      }
     }
+
+    const worldPosition = this.mesh.getWorldPosition(new THREE.Vector3());
+    const worldRotation = this.mesh.getWorldQuaternion(new THREE.Quaternion());
+
+    this.rigidBody.setTranslation(worldPosition, true);
+    this.rigidBody.setRotation(worldRotation, true);
+
+    const newHalfHeight = (this.initialHeight / 2) * this.mesh.scale.y;
+    this.collider.setHalfHeight(newHalfHeight);
   }
 }

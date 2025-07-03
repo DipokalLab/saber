@@ -10,6 +10,7 @@ import { Hilt } from "./hilt";
 import { useInGameStore, type InGameState } from "@/features/inGame/store";
 import { BulletManager } from "./bulletManager";
 import type { Bullet } from "./bullet";
+import * as RAPIER from "@dimforge/rapier3d-compat";
 
 export class Scene {
   scene: THREE.Scene;
@@ -20,6 +21,7 @@ export class Scene {
   hilt: Hilt;
   bulletManager: BulletManager;
   clock: THREE.Clock;
+  world: RAPIER.World;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -28,6 +30,9 @@ export class Scene {
       0.1,
       1000
     );
+
+    const gravity = { x: 0.0, y: 0.0, z: 0.0 };
+    this.world = new RAPIER.World(gravity);
 
     this.clock = new THREE.Clock();
 
@@ -44,7 +49,7 @@ export class Scene {
     this.hilt = new Hilt();
     this.scene.add(this.hilt.mesh);
 
-    this.saber = new Saber();
+    this.saber = new Saber(this.world);
     this.hilt.mesh.add(this.saber.mesh);
 
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
@@ -58,9 +63,13 @@ export class Scene {
 
     bloomEffect.selection.add(this.saber.mesh);
 
-    this.bulletManager = new BulletManager(this.scene, (bullet: Bullet) => {
-      bloomEffect.selection.add(bullet.mesh);
-    });
+    this.bulletManager = new BulletManager(
+      this.scene,
+      this.world,
+      (bullet: Bullet) => {
+        bloomEffect.selection.add(bullet.mesh);
+      }
+    );
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -115,6 +124,8 @@ export class Scene {
 
   animate() {
     //this.renderer.render(this.scene, this.camera);
+
+    this.world.step();
 
     const deltaTime = this.clock.getDelta();
     this.saber.update();

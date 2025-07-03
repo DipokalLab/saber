@@ -1,16 +1,23 @@
 import * as THREE from "three";
+import * as RAPIER from "@dimforge/rapier3d-compat";
 import { Bullet } from "./bullet";
 
 export class BulletManager {
   private scene: THREE.Scene;
+  private world: RAPIER.World;
   private bullets: Bullet[] = [];
   private spawnPositionsY = [0, 10, 30];
   private spawnTimer = 0;
   private nextSpawnTime = 0;
   private onBulletCreated: (bullet: Bullet) => void;
 
-  constructor(scene: THREE.Scene, onBulletCreated: (bullet: Bullet) => void) {
+  constructor(
+    scene: THREE.Scene,
+    world: RAPIER.World,
+    onBulletCreated: (bullet: Bullet) => void
+  ) {
     this.scene = scene;
+    this.world = world;
     this.onBulletCreated = onBulletCreated;
     this.setNextRandomSpawnTime();
   }
@@ -28,7 +35,7 @@ export class BulletManager {
     const z = -200;
 
     const position = new THREE.Vector3(x, y, z);
-    const bullet = new Bullet(position);
+    const bullet = new Bullet(this.world, position);
 
     this.bullets.push(bullet);
     this.scene.add(bullet.mesh);
@@ -52,9 +59,16 @@ export class BulletManager {
 
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const bullet = this.bullets[i];
-      bullet.update(deltaTime);
+      bullet.update();
 
-      if (bullet.mesh.position.z > 50) {
+      const bulletPosition = bullet.rigidBody.translation();
+      if (
+        bulletPosition.z > 200 ||
+        Math.abs(bulletPosition.x) > 100 ||
+        Math.abs(bulletPosition.y) > 100
+      ) {
+        this.world.removeCollider(bullet.rigidBody.collider(0), false);
+        this.world.removeRigidBody(bullet.rigidBody);
         this.scene.remove(bullet.mesh);
         bullet.mesh.geometry.dispose();
         bullet.mesh.material.dispose();
