@@ -11,6 +11,7 @@ import { useInGameStore, type InGameState } from "@/features/inGame/store";
 import { BulletManager } from "./bulletManager";
 import type { Bullet } from "./bullet";
 import * as RAPIER from "@dimforge/rapier3d-compat";
+import { RapierDebugRenderer } from "./rapierDebugRenderer";
 
 export class Scene {
   scene: THREE.Scene;
@@ -22,6 +23,7 @@ export class Scene {
   bulletManager: BulletManager;
   clock: THREE.Clock;
   world: RAPIER.World;
+  debugRenderer: RapierDebugRenderer;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -42,6 +44,8 @@ export class Scene {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setAnimationLoop(this.animate.bind(this));
+
+    this.debugRenderer = new RapierDebugRenderer(this.scene, this.world);
 
     const dom = document.querySelector("#game") as Element;
     dom.appendChild(this.renderer.domElement);
@@ -124,13 +128,16 @@ export class Scene {
 
   animate() {
     //this.renderer.render(this.scene, this.camera);
+    const deltaTime = this.clock.getDelta();
 
     this.world.step();
 
-    const deltaTime = this.clock.getDelta();
     this.saber.update();
     this.hilt.update();
+
     this.bulletManager.update(deltaTime);
+
+    this.debugRenderer.update();
 
     this.composer.render();
   }

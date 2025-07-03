@@ -24,7 +24,7 @@ export class Bullet {
       .setLinvel(0, 0, this.initialSpeed);
     this.rigidBody = world.createRigidBody(rigidBodyDesc);
 
-    const colliderDesc = RAPIER.ColliderDesc.capsule(length / 2, radius)
+    const colliderDesc = RAPIER.ColliderDesc.capsule(length / 2, radius * 2)
       .setRestitution(0.9)
       .setDensity(1.0);
 

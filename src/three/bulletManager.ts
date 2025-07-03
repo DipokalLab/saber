@@ -27,12 +27,9 @@ export class BulletManager {
   }
 
   private spawnBullet() {
-    const y =
-      this.spawnPositionsY[
-        Math.floor(Math.random() * this.spawnPositionsY.length)
-      ];
-    const x = THREE.MathUtils.randFloat(-5, 5);
-    const z = -200;
+    const y = 13;
+    const x = THREE.MathUtils.randFloat(-1, 1);
+    const z = -80;
 
     const position = new THREE.Vector3(x, y, z);
     const bullet = new Bullet(this.world, position);

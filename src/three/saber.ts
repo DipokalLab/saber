@@ -33,7 +33,7 @@ export class Saber {
 
     const colliderDesc = RAPIER.ColliderDesc.capsule(
       this.initialHeight / 2,
-      radius
+      radius * 2
     );
     this.collider = this.world.createCollider(colliderDesc, this.rigidBody);
 
