@@ -8,6 +8,8 @@ import {
 import { Saber } from "./saber";
 import { Hilt } from "./hilt";
 import { useInGameStore, type InGameState } from "@/features/inGame/store";
+import { BulletManager } from "./bulletManager";
+import type { Bullet } from "./bullet";
 
 export class Scene {
   scene: THREE.Scene;
@@ -16,6 +18,8 @@ export class Scene {
   composer: EffectComposer;
   saber: Saber;
   hilt: Hilt;
+  bulletManager: BulletManager;
+  clock: THREE.Clock;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -24,6 +28,8 @@ export class Scene {
       0.1,
       1000
     );
+
+    this.clock = new THREE.Clock();
 
     this.renderer = new THREE.WebGLRenderer({
       powerPreference: "high-performance",
@@ -51,6 +57,10 @@ export class Scene {
     });
 
     bloomEffect.selection.add(this.saber.mesh);
+
+    this.bulletManager = new BulletManager(this.scene, (bullet: Bullet) => {
+      bloomEffect.selection.add(bullet.mesh);
+    });
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -105,8 +115,12 @@ export class Scene {
 
   animate() {
     //this.renderer.render(this.scene, this.camera);
+
+    const deltaTime = this.clock.getDelta();
     this.saber.update();
     this.hilt.update();
+    this.bulletManager.update(deltaTime);
+
     this.composer.render();
   }
 }
