@@ -6,7 +6,6 @@ export class BulletManager {
   private scene: THREE.Scene;
   private world: RAPIER.World;
   private bullets: Bullet[] = [];
-  private spawnPositionsY = [0, 10, 30];
   private spawnTimer = 0;
   private nextSpawnTime = 0;
   private onBulletCreated: (bullet: Bullet) => void;

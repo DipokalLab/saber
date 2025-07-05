@@ -9,7 +9,7 @@ export class Bullet {
   constructor(world: RAPIER.World, position: THREE.Vector3) {
     const length = 5;
     const radius = 0.1;
-    this.initialSpeed = 40;
+    this.initialSpeed = 70;
 
     const geometry = new THREE.CapsuleGeometry(radius, length, 4, 8);
     const material = new THREE.MeshStandardMaterial({

@@ -21,18 +21,28 @@ export class Saber {
 
   constructor(world: RAPIER.World, listener: THREE.AudioListener) {
     this.world = world;
+
+    const color = 0xfffffff;
+    const emissive = 0xf02b2b;
+    const emissiveLight = 0xf25c5a;
+
     const height = 20;
     const radius = 0.25;
     const geometry = new THREE.CapsuleGeometry(radius, height, 4, 8, 1);
     const material = new THREE.MeshStandardMaterial({
-      color: 0xf25c5a,
-      emissive: 0xf02b2b,
+      color: color,
+      emissive: emissive,
     });
     material.emissiveIntensity = 7.5;
     this.mesh = new THREE.Mesh(geometry, material);
 
-    this.maxLightIntensity = 150;
-    this.light = new THREE.PointLight(0xf25c5a, 150, 40, 2);
+    this.maxLightIntensity = 250;
+    this.light = new THREE.PointLight(
+      emissiveLight,
+      this.maxLightIntensity,
+      80,
+      2
+    );
     this.light.position.y = height / 2;
     this.mesh.add(this.light);
 
