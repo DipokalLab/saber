@@ -4,6 +4,7 @@ import {
   EffectPass,
   RenderPass,
   SelectiveBloomEffect,
+  VignetteEffect,
 } from "postprocessing";
 import { Saber } from "./saber";
 import { Hilt } from "./hilt";
@@ -29,7 +30,7 @@ export class Scene {
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
-      75,
+      80,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
@@ -68,10 +69,16 @@ export class Scene {
     const light = new THREE.AmbientLight(0x404040);
     this.scene.add(light);
 
+    const vignetteEffect = new VignetteEffect({
+      eskil: false,
+      offset: 0.1,
+      darkness: 0.7,
+    });
+
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
       intensity: 8,
       mipmapBlur: true,
-      luminanceThreshold: 0,
+      luminanceThreshold: 0.1,
       luminanceSmoothing: 0.2,
       radius: 0.618,
       resolutionScale: 128,
@@ -89,7 +96,9 @@ export class Scene {
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.composer.addPass(new EffectPass(this.camera, bloomEffect));
+
+    const effectPass = new EffectPass(this.camera, bloomEffect, vignetteEffect);
+    this.composer.addPass(effectPass);
 
     this.camera.position.z = 30;
     this.camera.position.y = 10;
