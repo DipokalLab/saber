@@ -13,6 +13,9 @@ export class Saber {
   private animationDuration: number;
   private world: RAPIER.World;
 
+  private onSound: HTMLAudioElement;
+  private offSound: HTMLAudioElement;
+
   constructor(world: RAPIER.World) {
     this.world = world;
     const height = 20;
@@ -41,6 +44,9 @@ export class Saber {
     this.isOpening = false;
     this.animationStartTime = 0;
     this.animationDuration = 1000;
+
+    this.onSound = new Audio("/sound/on.mp3");
+    this.offSound = new Audio("/sound/off.mp3");
   }
 
   private _startAnimation(opening: boolean) {
@@ -52,8 +58,19 @@ export class Saber {
   }
 
   public toggle() {
-    const isCurrentlyOpen = this.mesh.scale.y > 0.99;
-    this._startAnimation(!isCurrentlyOpen);
+    if (this.isAnimating) return;
+
+    const isOpening = this.mesh.scale.y < 0.1;
+
+    if (isOpening) {
+      this.onSound.currentTime = 0;
+      this.onSound.play();
+    } else {
+      this.offSound.currentTime = 0;
+      this.offSound.play();
+    }
+
+    this._startAnimation(isOpening);
   }
 
   public update() {

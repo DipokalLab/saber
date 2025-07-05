@@ -12,6 +12,7 @@ import { BulletManager } from "./bulletManager";
 import type { Bullet } from "./bullet";
 import * as RAPIER from "@dimforge/rapier3d-compat";
 import { RapierDebugRenderer } from "./rapierDebugRenderer";
+import { World } from "./world";
 
 export class Scene {
   scene: THREE.Scene;
@@ -55,6 +56,12 @@ export class Scene {
 
     this.saber = new Saber(this.world);
     this.hilt.mesh.add(this.saber.mesh);
+
+    const world = new World();
+    this.scene.add(world.mesh);
+
+    const light = new THREE.AmbientLight(0x404040);
+    this.scene.add(light);
 
     const bloomEffect = new SelectiveBloomEffect(this.scene, this.camera, {
       intensity: 8,
@@ -137,7 +144,7 @@ export class Scene {
 
     this.bulletManager.update(deltaTime);
 
-    this.debugRenderer.update();
+    // this.debugRenderer.update();
 
     this.composer.render();
   }
