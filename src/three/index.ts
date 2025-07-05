@@ -25,6 +25,7 @@ export class Scene {
   clock: THREE.Clock;
   world: RAPIER.World;
   debugRenderer: RapierDebugRenderer;
+  firstStart: boolean;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -51,10 +52,13 @@ export class Scene {
     const dom = document.querySelector("#game") as Element;
     dom.appendChild(this.renderer.domElement);
 
+    const audioListener = new THREE.AudioListener();
+    this.camera.add(audioListener);
+
     this.hilt = new Hilt();
     this.scene.add(this.hilt.mesh);
 
-    this.saber = new Saber(this.world);
+    this.saber = new Saber(this.world, audioListener);
     this.hilt.mesh.add(this.saber.mesh);
 
     const world = new World();
@@ -89,6 +93,8 @@ export class Scene {
     this.camera.position.z = 30;
     this.camera.position.y = 10;
 
+    this.firstStart = true;
+
     window.addEventListener("resize", this.handleWindowResize.bind(this));
     window.addEventListener("click", this.handleClick.bind(this));
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
@@ -107,6 +113,10 @@ export class Scene {
   handleGameStartChange(state: InGameState) {
     if (state.isStart) {
       this.renderer.domElement.requestPointerLock();
+      if (this.firstStart) {
+        this.firstStart = false;
+        this.saber.playIdleSound(true);
+      }
     } else {
       document.exitPointerLock();
     }
@@ -127,7 +137,6 @@ export class Scene {
 
     if (e.target instanceof Element) {
       if (e.target.id == "root") {
-        //this.saber.toggle();
         this.renderer.domElement.requestPointerLock();
       }
     }

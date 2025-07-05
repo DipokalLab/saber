@@ -15,8 +15,9 @@ export class Saber {
 
   private onSound: HTMLAudioElement;
   private offSound: HTMLAudioElement;
+  idleSound: THREE.Audio<GainNode>;
 
-  constructor(world: RAPIER.World) {
+  constructor(world: RAPIER.World, listener: THREE.AudioListener) {
     this.world = world;
     const height = 20;
     const radius = 0.25;
@@ -47,6 +48,14 @@ export class Saber {
 
     this.onSound = new Audio("/sound/on.mp3");
     this.offSound = new Audio("/sound/off.mp3");
+
+    this.idleSound = new THREE.Audio(listener);
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load("/sound/idle.mp3", (buffer) => {
+      this.idleSound.setBuffer(buffer);
+      this.idleSound.setLoop(true);
+      this.idleSound.setVolume(0.3);
+    });
   }
 
   private _startAnimation(opening: boolean) {
@@ -55,6 +64,20 @@ export class Saber {
     this.isOpening = opening;
     this.isAnimating = true;
     this.animationStartTime = performance.now();
+
+    this.playIdleSound(opening);
+  }
+
+  public playIdleSound(opening: boolean) {
+    if (opening) {
+      if (this.idleSound.buffer && !this.idleSound.isPlaying) {
+        this.idleSound.play();
+      }
+    } else {
+      if (this.idleSound.isPlaying) {
+        this.idleSound.stop();
+      }
+    }
   }
 
   public toggle() {
