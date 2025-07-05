@@ -34,6 +34,7 @@ export class Scene {
       0.1,
       1000
     );
+    this.scene.background = new THREE.Color("#000000");
 
     const gravity = { x: 0.0, y: 0.0, z: 0.0 };
     this.world = new RAPIER.World(gravity);

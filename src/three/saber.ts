@@ -16,6 +16,8 @@ export class Saber {
   private onSound: HTMLAudioElement;
   private offSound: HTMLAudioElement;
   idleSound: THREE.Audio<GainNode>;
+  maxLightIntensity: number;
+  light: THREE.PointLight;
 
   constructor(world: RAPIER.World, listener: THREE.AudioListener) {
     this.world = world;
@@ -28,6 +30,11 @@ export class Saber {
     });
     material.emissiveIntensity = 7.5;
     this.mesh = new THREE.Mesh(geometry, material);
+
+    this.maxLightIntensity = 150;
+    this.light = new THREE.PointLight(0xf25c5a, 150, 40, 2);
+    this.light.position.y = height / 2;
+    this.mesh.add(this.light);
 
     this.initialHeight = height;
     this.mesh.position.y = this.initialHeight / 2;
@@ -120,6 +127,19 @@ export class Saber {
         this.isAnimating = false;
         this.mesh.scale.y = targetScaleY;
         this.mesh.position.y = targetPositionY;
+      }
+
+      if (this.isOpening) {
+        this.light.intensity = this.maxLightIntensity * easedProgress;
+      } else {
+        this.light.intensity = this.maxLightIntensity * (1.0 - easedProgress);
+      }
+
+      if (progress >= 1.0) {
+        this.isAnimating = false;
+        this.mesh.scale.y = targetScaleY;
+        this.mesh.position.y = targetPositionY;
+        this.light.intensity = this.isOpening ? this.maxLightIntensity : 0;
       }
     }
 
