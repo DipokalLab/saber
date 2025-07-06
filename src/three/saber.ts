@@ -19,7 +19,7 @@ export class Saber {
   idleSound: THREE.Audio<GainNode>;
   maxLightIntensity: number;
   light: THREE.PointLight;
-  hitSound: HTMLAudioElement;
+  hitSounds: HTMLAudioElement[];
 
   constructor(world: RAPIER.World, listener: THREE.AudioListener) {
     this.world = world;
@@ -68,8 +68,12 @@ export class Saber {
 
     this.onSound = new Audio("/sound/on.mp3");
     this.offSound = new Audio("/sound/off.mp3");
-    this.hitSound = new Audio("/sound/impact1.mp3");
-    this.hitSound.volume = 0.2;
+    this.hitSounds = [];
+    for (let i = 1; i <= 3; i++) {
+      const sound = new Audio(`/sound/impact${i}.mp3`);
+      sound.volume = 0.1;
+      this.hitSounds.push(sound);
+    }
 
     this.idleSound = new THREE.Audio(listener);
     const audioLoader = new THREE.AudioLoader();
@@ -83,8 +87,13 @@ export class Saber {
   public handleHit() {
     if (this.mesh.scale.y < 0.1) return;
 
-    this.hitSound.currentTime = 0;
-    this.hitSound.play();
+    const randomIndex = Math.floor(Math.random() * this.hitSounds.length);
+    const randomHitSound = this.hitSounds[randomIndex];
+
+    if (randomHitSound) {
+      randomHitSound.currentTime = 0;
+      randomHitSound.play();
+    }
   }
 
   private _startAnimation(opening: boolean) {
