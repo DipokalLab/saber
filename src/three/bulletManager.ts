@@ -26,12 +26,21 @@ export class BulletManager {
   }
 
   private spawnBullet() {
-    const y = 13;
-    const x = THREE.MathUtils.randFloat(-1, 1);
+    const y = THREE.MathUtils.randFloat(9, 14);
+    const x = THREE.MathUtils.randFloat(-5, 5);
     const z = -80;
-
     const position = new THREE.Vector3(x, y, z);
-    const bullet = new Bullet(this.world, position);
+
+    const targetX = THREE.MathUtils.randFloat(-2, 2);
+    const targetY = THREE.MathUtils.randFloat(9, 14);
+    const targetZ = 0;
+    const targetPosition = new THREE.Vector3(targetX, targetY, targetZ);
+
+    const direction = new THREE.Vector3()
+      .subVectors(targetPosition, position)
+      .normalize();
+
+    const bullet = new Bullet(this.world, position, direction);
 
     this.bullets.push(bullet);
     this.scene.add(bullet.mesh);

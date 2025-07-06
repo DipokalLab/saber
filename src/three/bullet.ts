@@ -13,7 +13,11 @@ export class Bullet {
   private initialSpeed: number;
   private hasBeenDeflected = false;
 
-  constructor(world: RAPIER.World, position: THREE.Vector3) {
+  constructor(
+    world: RAPIER.World,
+    position: THREE.Vector3,
+    direction: THREE.Vector3
+  ) {
     const length = 5;
     const radius = 0.1;
     this.initialSpeed = 70;
@@ -26,9 +30,11 @@ export class Bullet {
     material.emissiveIntensity = 10;
     this.mesh = new THREE.Mesh(geometry, material);
 
+    const initialVelocity = direction.multiplyScalar(this.initialSpeed);
+
     const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
       .setTranslation(position.x, position.y, position.z)
-      .setLinvel(0, 0, this.initialSpeed);
+      .setLinvel(initialVelocity.x, initialVelocity.y, initialVelocity.z);
     this.rigidBody = world.createRigidBody(rigidBodyDesc);
 
     const colliderDesc = RAPIER.ColliderDesc.capsule(length / 2, radius * 2)
