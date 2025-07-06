@@ -8,6 +8,7 @@ import AnimatedTitle from "@/features/title/Title";
 import HandTrackingButton from "@/features/trackingHand/HandTrackingButton";
 import { useInGameStore } from "@/features/inGame/store";
 import { useMouseTracker } from "@/features/trackingMouse/useMouseTracker";
+import { HitVignette } from "@/features/hit/HitVignette";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
@@ -41,6 +42,8 @@ export default function HomePage() {
   return (
     <>
       <HandTrackingButton />
+      <HitVignette />
+
       <main className={mainClasses}>
         <section className="text-center max-w-3xl text-white">
           <AnimatedTitle className="mb-4">Light Saber Simulator</AnimatedTitle>

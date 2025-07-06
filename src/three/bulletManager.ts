@@ -54,6 +54,18 @@ export class BulletManager {
     }
   }
 
+  public removeBullet(bulletToRemove: Bullet) {
+    const index = this.bullets.indexOf(bulletToRemove);
+    if (index > -1) {
+      this.world.removeCollider(bulletToRemove.rigidBody.collider(0), false);
+      this.world.removeRigidBody(bulletToRemove.rigidBody);
+      this.scene.remove(bulletToRemove.mesh);
+      bulletToRemove.mesh.geometry.dispose();
+      (bulletToRemove.mesh.material as THREE.Material).dispose();
+      this.bullets.splice(index, 1);
+    }
+  }
+
   public update(deltaTime: number) {
     this.spawnTimer += deltaTime;
     if (this.spawnTimer > this.nextSpawnTime) {

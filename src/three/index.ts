@@ -15,6 +15,8 @@ import * as RAPIER from "@dimforge/rapier3d-compat";
 import { RapierDebugRenderer } from "./rapierDebugRenderer";
 import { World } from "./world";
 import type { UserDataCollider } from "./type";
+import { Player } from "./player";
+import { useHeartStore } from "@/features/heart/store";
 
 export class Scene {
   scene: THREE.Scene;
@@ -30,6 +32,8 @@ export class Scene {
   firstStart: boolean;
   eventQueue: RAPIER.EventQueue;
   private cameraSwayTarget = new THREE.Vector2();
+  player: Player;
+  vignetteEffect!: VignetteEffect;
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -68,13 +72,20 @@ export class Scene {
     this.saber = new Saber(this.world, audioListener);
     this.hilt.mesh.add(this.saber.mesh);
 
+    const { decreaseHeart } = useHeartStore.getState();
+
+    this.player = new Player(this.world, (hearts) => {
+      console.log(`left: ${hearts}`);
+      decreaseHeart();
+    });
+
     const world = new World();
     this.scene.add(world.mesh);
 
     const light = new THREE.AmbientLight(0x404040);
     this.scene.add(light);
 
-    const vignetteEffect = new VignetteEffect({
+    this.vignetteEffect = new VignetteEffect({
       eskil: false,
       offset: 0.1,
       darkness: 0.7,
@@ -102,7 +113,11 @@ export class Scene {
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
 
-    const effectPass = new EffectPass(this.camera, bloomEffect, vignetteEffect);
+    const effectPass = new EffectPass(
+      this.camera,
+      bloomEffect,
+      this.vignetteEffect
+    );
     this.composer.addPass(effectPass);
 
     this.camera.position.z = 30;
@@ -204,6 +219,19 @@ export class Scene {
         saber.handleHit();
         bullet.deflect();
       }
+
+      if (
+        (object1 instanceof Player && object2 instanceof Bullet) ||
+        (object2 instanceof Player && object1 instanceof Bullet)
+      ) {
+        const player =
+          object1 instanceof Player ? object1 : (object2 as Player);
+        const bullet =
+          object1 instanceof Bullet ? object1 : (object2 as Bullet);
+
+        player.handleHit();
+        this.bulletManager.removeBullet(bullet);
+      }
     });
   }
 
@@ -234,6 +262,7 @@ export class Scene {
     this.handleCollision();
     this.handleCameraAnimate();
 
+    this.player.update(this.camera);
     this.saber.update();
     this.hilt.update();
 
