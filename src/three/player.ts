@@ -5,14 +5,9 @@ import type { UserDataCollider } from "./type";
 export class Player {
   public rigidBody: RAPIER.RigidBody;
   public collider: UserDataCollider;
-  public hearts: number;
+  private onDamage: () => void;
 
-  private maxHearts: number;
-  private onDamage: (currentHearts: number) => void;
-
-  constructor(world: RAPIER.World, onDamage: (currentHearts: number) => void) {
-    this.maxHearts = 10;
-    this.hearts = this.maxHearts;
+  constructor(world: RAPIER.World, onDamage: () => void) {
     this.onDamage = onDamage;
 
     const halfExtents = { x: 2, y: 2, z: 2 };
@@ -35,11 +30,7 @@ export class Player {
   }
 
   public handleHit() {
-    if (this.hearts > 0) {
-      this.hearts -= 1;
-      console.log(`Player Hit! Hearts remaining: ${this.hearts}`);
-      this.onDamage(this.hearts);
-    }
+    this.onDamage();
   }
 
   public update(camera: THREE.Camera) {

@@ -72,13 +72,6 @@ export class Scene {
     this.saber = new Saber(this.world, audioListener);
     this.hilt.mesh.add(this.saber.mesh);
 
-    const { decreaseHeart } = useHeartStore.getState();
-
-    this.player = new Player(this.world, (hearts) => {
-      console.log(`left: ${hearts}`);
-      decreaseHeart();
-    });
-
     const world = new World();
     this.scene.add(world.mesh);
 
@@ -130,6 +123,8 @@ export class Scene {
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
     window.addEventListener("mousemove", this.handleCameraSway.bind(this));
 
+    this.player = new Player(this.world, this.handleHitPlayer.bind(this));
+
     useInGameStore.subscribe((currentState) => {
       this.handleGameStartChange(currentState);
     });
@@ -152,6 +147,15 @@ export class Scene {
       -maxSway,
       maxSway
     );
+  }
+
+  handleHitPlayer() {
+    if (!useInGameStore.getState().isStart) {
+      return;
+    }
+
+    const { decreaseHeart } = useHeartStore.getState();
+    decreaseHeart();
   }
 
   handleKeyDown(e: KeyboardEvent) {

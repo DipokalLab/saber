@@ -6,7 +6,7 @@ interface HeartState {
   isDead: boolean;
   justHit: boolean;
   decreaseHeart: () => void;
-  clearHit: () => void; // 피격 상태를 해제할 액션
+  clearHit: () => void;
   resetHearts: () => void;
 }
 
@@ -16,7 +16,7 @@ export const useHeartStore = create<HeartState>((set) => ({
   hearts: INITIAL_HEARTS,
   maxHearts: INITIAL_HEARTS,
   isDead: false,
-  justHit: false, // 초기값은 false
+  justHit: false,
 
   decreaseHeart: () =>
     set((state) => {
@@ -24,7 +24,7 @@ export const useHeartStore = create<HeartState>((set) => ({
       return {
         hearts: newHearts,
         isDead: newHearts === 0,
-        justHit: true, // 피격 시 true로 변경
+        justHit: true,
       };
     }),
 
