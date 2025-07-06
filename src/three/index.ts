@@ -155,6 +155,8 @@ export class Scene {
     }
   }
 
+  handleCollision() {}
+
   animate() {
     //this.renderer.render(this.scene, this.camera);
     const deltaTime = this.clock.getDelta();
@@ -173,14 +175,19 @@ export class Scene {
       if (!object1 || !object2) return;
 
       let saber: Saber | null = null;
+      let bullet: Bullet | null = null;
+
       if (object1 instanceof Saber && object2 instanceof Bullet) {
         saber = object1;
+        bullet = object2;
       } else if (object2 instanceof Saber && object1 instanceof Bullet) {
         saber = object2;
+        bullet = object1;
       }
 
-      if (saber) {
+      if (saber && bullet) {
         saber.handleHit();
+        bullet.deflect();
       }
     });
 

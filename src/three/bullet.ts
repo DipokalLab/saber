@@ -11,6 +11,7 @@ export class Bullet {
   public mesh: THREE.Mesh<THREE.CapsuleGeometry, THREE.MeshStandardMaterial>;
   public rigidBody: RAPIER.RigidBody;
   private initialSpeed: number;
+  private hasBeenDeflected = false;
 
   constructor(world: RAPIER.World, position: THREE.Vector3) {
     const length = 5;
@@ -33,7 +34,10 @@ export class Bullet {
     const colliderDesc = RAPIER.ColliderDesc.capsule(length / 2, radius * 2)
       .setRestitution(0.9)
       .setDensity(1.0)
-      .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+      .setActiveEvents(
+        RAPIER.ActiveEvents.COLLISION_EVENTS |
+          RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS
+      );
 
     const collider = world.createCollider(
       colliderDesc,
@@ -42,29 +46,62 @@ export class Bullet {
     collider.userData = { object: this };
   }
 
+  public deflect() {
+    if (this.hasBeenDeflected) {
+      return;
+    }
+    this.hasBeenDeflected = true;
+
+    const currentVelocity = new THREE.Vector3().copy(
+      this.rigidBody.linvel() as THREE.Vector3
+    );
+
+    const reversedVelocity = currentVelocity.negate();
+
+    const randomVector = new THREE.Vector3(
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1
+    );
+
+    randomVector.multiplyScalar(15);
+
+    const finalVelocity = reversedVelocity.add(randomVector);
+
+    this.rigidBody.setLinvel(finalVelocity, true);
+  }
+
   public update() {
-    const linvel = this.rigidBody.linvel();
-    const currentSpeedSq = linvel.x ** 2 + linvel.y ** 2 + linvel.z ** 2;
-
-    if (currentSpeedSq > 0.0001) {
-      const currentSpeed = Math.sqrt(currentSpeedSq);
-
-      this.rigidBody.setLinvel(
-        {
-          x: (linvel.x / currentSpeed) * this.initialSpeed,
-          y: (linvel.y / currentSpeed) * this.initialSpeed,
-          z: (linvel.z / currentSpeed) * this.initialSpeed,
-        },
-        true
+    if (!this.hasBeenDeflected) {
+      const linvel = this.rigidBody.linvel();
+      const currentSpeed = Math.sqrt(
+        linvel.x ** 2 + linvel.y ** 2 + linvel.z ** 2
       );
 
-      const upVector = new THREE.Vector3(0, 1, 0);
+      if (currentSpeed > 0.001) {
+        this.rigidBody.setLinvel(
+          {
+            x: (linvel.x / currentSpeed) * this.initialSpeed,
+            y: (linvel.y / currentSpeed) * this.initialSpeed,
+            z: (linvel.z / currentSpeed) * this.initialSpeed,
+          },
+          true
+        );
+      }
+    }
+
+    const currentLinvel = this.rigidBody.linvel();
+    const speedSq =
+      currentLinvel.x ** 2 + currentLinvel.y ** 2 + currentLinvel.z ** 2;
+
+    if (speedSq > 0.0001) {
       const velocityDirection = new THREE.Vector3(
-        linvel.x,
-        linvel.y,
-        linvel.z
+        currentLinvel.x,
+        currentLinvel.y,
+        currentLinvel.z
       ).normalize();
 
+      const upVector = new THREE.Vector3(0, 1, 0);
       const rotation = new THREE.Quaternion().setFromUnitVectors(
         upVector,
         velocityDirection
