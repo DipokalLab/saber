@@ -128,6 +128,12 @@ export class Scene {
     useInGameStore.subscribe((currentState) => {
       this.handleGameStartChange(currentState);
     });
+
+    useHeartStore.subscribe((currentState) => {
+      if (currentState.hearts <= 0) {
+        document.exitPointerLock();
+      }
+    });
   }
 
   private handleCameraSway(event: MouseEvent) {
