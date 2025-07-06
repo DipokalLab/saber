@@ -29,6 +29,8 @@ export class Scene {
   debugRenderer: RapierDebugRenderer;
   firstStart: boolean;
   eventQueue: RAPIER.EventQueue;
+  private cameraSwayTarget = new THREE.Vector2();
+
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -111,10 +113,30 @@ export class Scene {
     window.addEventListener("resize", this.handleWindowResize.bind(this));
     window.addEventListener("click", this.handleClick.bind(this));
     window.addEventListener("keydown", this.handleKeyDown.bind(this));
+    window.addEventListener("mousemove", this.handleCameraSway.bind(this));
 
     useInGameStore.subscribe((currentState) => {
       this.handleGameStartChange(currentState);
     });
+  }
+
+  private handleCameraSway(event: MouseEvent) {
+    const sensitivity = 0.004;
+    const maxSway = 0.03;
+
+    this.cameraSwayTarget.y -= event.movementX * sensitivity;
+    this.cameraSwayTarget.x -= event.movementY * sensitivity;
+
+    this.cameraSwayTarget.x = THREE.MathUtils.clamp(
+      this.cameraSwayTarget.x,
+      -maxSway,
+      maxSway
+    );
+    this.cameraSwayTarget.y = THREE.MathUtils.clamp(
+      this.cameraSwayTarget.y,
+      -maxSway,
+      maxSway
+    );
   }
 
   handleKeyDown(e: KeyboardEvent) {
@@ -155,14 +177,7 @@ export class Scene {
     }
   }
 
-  handleCollision() {}
-
-  animate() {
-    //this.renderer.render(this.scene, this.camera);
-    const deltaTime = this.clock.getDelta();
-
-    this.world.step(this.eventQueue);
-
+  handleCollision() {
     this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
       if (!started) return;
 
@@ -190,6 +205,34 @@ export class Scene {
         bullet.deflect();
       }
     });
+  }
+
+  handleCameraAnimate() {
+    const decayFactor = 0.95;
+    const lerpFactor = 0.04;
+
+    this.cameraSwayTarget.multiplyScalar(decayFactor);
+
+    this.camera.rotation.x = THREE.MathUtils.lerp(
+      this.camera.rotation.x,
+      this.cameraSwayTarget.x,
+      lerpFactor
+    );
+    this.camera.rotation.y = THREE.MathUtils.lerp(
+      this.camera.rotation.y,
+      this.cameraSwayTarget.y,
+      lerpFactor
+    );
+  }
+
+  animate() {
+    //this.renderer.render(this.scene, this.camera);
+    const deltaTime = this.clock.getDelta();
+
+    this.world.step(this.eventQueue);
+
+    this.handleCollision();
+    this.handleCameraAnimate();
 
     this.saber.update();
     this.hilt.update();
