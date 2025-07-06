@@ -10,10 +10,11 @@ import { Saber } from "./saber";
 import { Hilt } from "./hilt";
 import { useInGameStore, type InGameState } from "@/features/inGame/store";
 import { BulletManager } from "./bulletManager";
-import type { Bullet } from "./bullet";
+import { Bullet } from "./bullet";
 import * as RAPIER from "@dimforge/rapier3d-compat";
 import { RapierDebugRenderer } from "./rapierDebugRenderer";
 import { World } from "./world";
+import type { UserDataCollider } from "./type";
 
 export class Scene {
   scene: THREE.Scene;
@@ -27,6 +28,7 @@ export class Scene {
   world: RAPIER.World;
   debugRenderer: RapierDebugRenderer;
   firstStart: boolean;
+  eventQueue: RAPIER.EventQueue;
   constructor() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -39,6 +41,7 @@ export class Scene {
 
     const gravity = { x: 0.0, y: 0.0, z: 0.0 };
     this.world = new RAPIER.World(gravity);
+    this.eventQueue = new RAPIER.EventQueue(true);
 
     this.clock = new THREE.Clock();
 
@@ -156,7 +159,30 @@ export class Scene {
     //this.renderer.render(this.scene, this.camera);
     const deltaTime = this.clock.getDelta();
 
-    this.world.step();
+    this.world.step(this.eventQueue);
+
+    this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      if (!started) return;
+
+      const collider1 = this.world.getCollider(handle1) as UserDataCollider;
+      const collider2 = this.world.getCollider(handle2) as UserDataCollider;
+
+      const object1 = collider1.userData?.object;
+      const object2 = collider2.userData?.object;
+
+      if (!object1 || !object2) return;
+
+      let saber: Saber | null = null;
+      if (object1 instanceof Saber && object2 instanceof Bullet) {
+        saber = object1;
+      } else if (object2 instanceof Saber && object1 instanceof Bullet) {
+        saber = object2;
+      }
+
+      if (saber) {
+        saber.handleHit();
+      }
+    });
 
     this.saber.update();
     this.hilt.update();

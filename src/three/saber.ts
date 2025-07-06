@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import * as RAPIER from "@dimforge/rapier3d-compat";
+import type { UserDataCollider } from "./type";
 
 export class Saber {
   public mesh: THREE.Mesh<THREE.CapsuleGeometry, THREE.MeshStandardMaterial>;
   public rigidBody: RAPIER.RigidBody;
-  public collider: RAPIER.Collider;
+  public collider: UserDataCollider;
 
   private initialHeight: number;
   private isAnimating: boolean;
@@ -18,6 +19,7 @@ export class Saber {
   idleSound: THREE.Audio<GainNode>;
   maxLightIntensity: number;
   light: THREE.PointLight;
+  hitSound: HTMLAudioElement;
 
   constructor(world: RAPIER.World, listener: THREE.AudioListener) {
     this.world = world;
@@ -55,8 +57,9 @@ export class Saber {
     const colliderDesc = RAPIER.ColliderDesc.capsule(
       this.initialHeight / 2,
       radius * 2
-    );
+    ).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     this.collider = this.world.createCollider(colliderDesc, this.rigidBody);
+    this.collider.userData = { object: this };
 
     this.isAnimating = false;
     this.isOpening = false;
@@ -65,6 +68,8 @@ export class Saber {
 
     this.onSound = new Audio("/sound/on.mp3");
     this.offSound = new Audio("/sound/off.mp3");
+    this.hitSound = new Audio("/sound/impact1.mp3");
+    this.hitSound.volume = 0.2;
 
     this.idleSound = new THREE.Audio(listener);
     const audioLoader = new THREE.AudioLoader();
@@ -73,6 +78,13 @@ export class Saber {
       this.idleSound.setLoop(true);
       this.idleSound.setVolume(0.3);
     });
+  }
+
+  public handleHit() {
+    if (this.mesh.scale.y < 0.1) return;
+
+    this.hitSound.currentTime = 0;
+    this.hitSound.play();
   }
 
   private _startAnimation(opening: boolean) {

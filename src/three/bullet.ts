@@ -1,6 +1,12 @@
 import * as THREE from "three";
 import * as RAPIER from "@dimforge/rapier3d-compat";
 
+interface bulletCollider extends RAPIER.Collider {
+  userData?: {
+    object: Bullet;
+  };
+}
+
 export class Bullet {
   public mesh: THREE.Mesh<THREE.CapsuleGeometry, THREE.MeshStandardMaterial>;
   public rigidBody: RAPIER.RigidBody;
@@ -26,9 +32,14 @@ export class Bullet {
 
     const colliderDesc = RAPIER.ColliderDesc.capsule(length / 2, radius * 2)
       .setRestitution(0.9)
-      .setDensity(1.0);
+      .setDensity(1.0)
+      .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
 
-    world.createCollider(colliderDesc, this.rigidBody);
+    const collider = world.createCollider(
+      colliderDesc,
+      this.rigidBody
+    ) as bulletCollider;
+    collider.userData = { object: this };
   }
 
   public update() {
