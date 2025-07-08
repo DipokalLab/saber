@@ -3,6 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useInGameStore } from "../inGame/store";
 import { useHandTracking } from "./useHandTracking";
 
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
+
 const HandTrackingButton: React.FC = () => {
   const { videoRef, isTrackingEnabled, setIsTrackingEnabled } =
     useHandTracking();
@@ -18,6 +24,10 @@ const HandTrackingButton: React.FC = () => {
       setControlMode("mouse");
     }
   };
+
+  if (isMobile()) {
+    return null;
+  }
 
   return (
     <>
