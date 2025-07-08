@@ -188,6 +188,8 @@ export class Scene {
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
+    this.composer.setSize(window.innerWidth, window.innerHeight);
+
     this.animate();
   }
 

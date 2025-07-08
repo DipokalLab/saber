@@ -2,6 +2,7 @@ import { useInGameStore } from "@/features/inGame/store";
 import { useMouseStore } from "@/features/trackingMouse/stote";
 import { useHandStore } from "@/features/trackingHand/store";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export class Hilt {
   mesh: THREE.Group;
@@ -32,11 +33,33 @@ export class Hilt {
   constructor() {
     this.mesh = new THREE.Group();
 
-    const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const hilt = new THREE.Mesh(geometry, material);
-    hilt.position.set(0, -1, 0);
-    this.mesh.add(hilt);
+    // const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
+    // const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    // const hilt = new THREE.Mesh(geometry, material);
+    // hilt.position.set(0, -1, 0);
+    // this.mesh.add(hilt);
+
+    this.loadGlb("/assets/saber.glb");
+  }
+
+  private async loadGlb(url: string) {
+    const loader = new GLTFLoader();
+    try {
+      const gltf = await loader.loadAsync(url);
+      const model = gltf.scene;
+      const scale = 0.9;
+      model.position.set(0, -2, 0);
+      model.scale.set(scale, scale, scale);
+
+      this.mesh.add(model);
+    } catch (error) {
+      console.error("An error happened while loading the model:", error);
+      const geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 32);
+      const material = new THREE.MeshBasicMaterial({ color: 0x888888 });
+      const fallbackHilt = new THREE.Mesh(geometry, material);
+      fallbackHilt.position.set(0, -1, 0);
+      this.mesh.add(fallbackHilt);
+    }
   }
 
   updateHand() {
