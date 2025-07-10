@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 export class World {
   mesh: THREE.Group<THREE.Object3DEventMap>;
@@ -9,16 +10,26 @@ export class World {
     this.mesh.name = "World";
     this.mesh.position.set(0, 0, 0);
 
-    //this.loadGlb();
-    this.loadPlane();
+    this.loadGlb();
+    //this.loadPlane();
   }
 
   loadGlb() {
     const loader = new GLTFLoader();
+
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+    loader.setDRACOLoader(dracoLoader);
+
     loader.load("/assets/world.glb", (gltf) => {
-      this.mesh.add(gltf.scene);
-      this.mesh.scale.set(0.1, 0.1, 0.1);
-      this.mesh.position.set(0, -2, 0);
+      const model = gltf.scene;
+      const scale = 20;
+      model.scale.set(scale, scale, scale);
+      model.position.set(30, 0, 0);
+      model.rotateY(-Math.PI / 2);
+
+      this.mesh.add(model);
+      this.mesh.position.set(0, -9, 0);
     });
   }
 
