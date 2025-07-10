@@ -10,7 +10,7 @@ interface HeartState {
   resetHearts: () => void;
 }
 
-const INITIAL_HEARTS = 10;
+const INITIAL_HEARTS = 30;
 
 export const useHeartStore = create<HeartState>((set) => ({
   hearts: INITIAL_HEARTS,
