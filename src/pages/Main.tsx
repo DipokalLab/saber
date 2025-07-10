@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
-import { Play, SquareCode } from "lucide-react";
+import { Play, Scale, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
 import HandTrackingButton from "@/features/trackingHand/HandTrackingButton";
 import { useInGameStore } from "@/features/inGame/store";
@@ -11,9 +11,17 @@ import { useMouseTracker } from "@/features/trackingMouse/useMouseTracker";
 import { HitVignette } from "@/features/hit/HitVignette";
 import { GameOverScreen } from "@/features/endGame/GameOverScreen";
 import { HeartsDisplay } from "@/features/heart/Display";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AssetLicenseList } from "@/components/License";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
+  const [isLicenseOpen, setIsLicenseOpen] = useState(false);
   const setIsStart = useInGameStore((state) => state.setIsStart);
   useMouseTracker();
 
@@ -26,6 +34,7 @@ export default function HomePage() {
     "absolute",
     "inset-0",
     "flex",
+    "z-40",
     "flex-col",
     "items-center",
     "justify-center",
@@ -68,9 +77,23 @@ export default function HomePage() {
                 GitHub
               </a>
             </Button>
+
+            <Button size="lg" onClick={() => setIsLicenseOpen(true)}>
+              <Scale className="mr-2 h-5 w-5" />
+              License
+            </Button>
           </div>
         </section>
       </main>
+
+      <Dialog open={isLicenseOpen} onOpenChange={setIsLicenseOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Licenses</DialogTitle>
+          </DialogHeader>
+          <AssetLicenseList />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

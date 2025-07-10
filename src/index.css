@@ -133,7 +133,7 @@ body,
   height: 100%;
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: 10;
 }
 
 #root {
@@ -142,5 +142,5 @@ body,
   height: 100%;
   top: 0;
   left: 0;
-  z-index: 200;
+  z-index: 20;
 }
