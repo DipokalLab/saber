@@ -24,6 +24,8 @@ This is a web 3D lightsaber simulator built with three.js, with a strong focus o
 
 ## Demo
 
+https://github.com/user-attachments/assets/d9c3c652-467b-44d5-8b1f-2807093aab70
+
 ## Contributors
 
 Hyeong Jun Huh [(GitHub)](https://github.com/DipokalLab)
