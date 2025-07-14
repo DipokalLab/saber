@@ -31,9 +31,13 @@ export class Scene {
   debugRenderer: RapierDebugRenderer;
   firstStart: boolean;
   eventQueue: RAPIER.EventQueue;
-  private cameraSwayTarget = new THREE.Vector2();
+
   player: Player;
   vignetteEffect!: VignetteEffect;
+
+  private cameraSwayTarget = new THREE.Vector2();
+  private accumulator = 0.0;
+  private readonly timeStep = 1.0 / 60.0;
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -266,22 +270,25 @@ export class Scene {
   }
 
   animate() {
-    //this.renderer.render(this.scene, this.camera);
     const deltaTime = this.clock.getDelta();
+    this.accumulator += deltaTime;
 
-    this.world.step(this.eventQueue);
-
-    this.handleCollision();
     this.handleCameraAnimate();
 
-    this.player.update(this.camera);
     this.saber.update();
     this.hilt.update();
 
-    this.bulletManager.update(deltaTime);
+    while (this.accumulator >= this.timeStep) {
+      this.world.integrationParameters.dt = this.timeStep;
+      this.world.step(this.eventQueue);
+      this.handleCollision();
 
-    // this.debugRenderer.update();
+      this.player.update(this.camera);
 
+      this.bulletManager.update(this.timeStep);
+
+      this.accumulator -= this.timeStep;
+    }
     this.composer.render();
   }
 }

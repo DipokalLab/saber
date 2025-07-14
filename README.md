@@ -13,11 +13,14 @@
 
 ## About The Project
 
-This is a web 3D lightsaber simulator built with three.js, with a strong focus on performance and design. Reflect incoming blaster bolts with your lightsaber and feel like a true Jedi or Sith!
+This is a web 3D lightsaber simulator built with three.js, with a strong focus on performance and design. Reflect incoming blaster bolts with your lightsaber.
+
+Press the Spacebar to toggle the lightsaber.
 
 ## Roadmap
 
 - [x] Basic Saber
+- [x] Camera Control
 - [ ] More blade color
 - [ ] Show left time
 - [ ] Add hardware control
