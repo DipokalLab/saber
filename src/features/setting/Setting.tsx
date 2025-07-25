@@ -52,15 +52,6 @@ export function Setting() {
     setReceivedData([]);
   };
 
-  const sendData = async (data: string) => {
-    if (!port?.writable) {
-      return;
-    }
-    const writer = port.writable.getWriter();
-    await writer.write(new TextEncoder().encode(data + "\n"));
-    writer.releaseLock();
-  };
-
   useEffect(() => {
     if (!port) return;
 
@@ -149,25 +140,21 @@ export function Setting() {
                     <Button onClick={handleConnect}>Connect</Button>
                   )}
 
-                  {port && (
-                    <div style={{ marginTop: "20px" }}>
-                      <Button onClick={() => sendData("LED_ON")}>LED On</Button>
-                      <Button
-                        onClick={() => sendData("LED_OFF")}
-                        style={{ marginLeft: "10px" }}
-                      >
-                        LED Off
-                      </Button>
-                    </div>
-                  )}
-
-                  <div style={{ marginTop: "20px" }}>
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      height: "300px",
+                      width: "100%",
+                      overflow: "scroll",
+                    }}
+                  >
                     <pre
                       style={{
                         border: "1px solid #ccc",
                         padding: "10px",
                         minHeight: "100px",
                         background: "#f9f9f9",
+                        fontSize: "10px",
                       }}
                     >
                       {receivedData.join("") || "..."}
