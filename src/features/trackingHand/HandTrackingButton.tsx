@@ -32,7 +32,7 @@ const HandTrackingButton: React.FC = () => {
   return (
     <>
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
-      <Button className="absolute top-4 right-4 z-300" onClick={handleClick}>
+      <Button onClick={handleClick}>
         {isTrackingEnabled ? "Disable Camera" : "Enable Camera"}
       </Button>
     </>

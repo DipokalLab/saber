@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import { Play, Scale, SquareCode } from "lucide-react";
 import AnimatedTitle from "@/features/title/Title";
-import HandTrackingButton from "@/features/trackingHand/HandTrackingButton";
 import { useInGameStore } from "@/features/inGame/store";
 import { useMouseTracker } from "@/features/trackingMouse/useMouseTracker";
 import { HitVignette } from "@/features/hit/HitVignette";
@@ -18,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AssetLicenseList } from "@/components/License";
+import { Setting } from "@/features/setting/Setting";
 
 export default function HomePage() {
   const [isVisible, setIsVisible] = useState(true);
@@ -52,7 +52,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HandTrackingButton />
+      <Setting />
       <HitVignette />
       <GameOverScreen />
       <HeartsDisplay />
